@@ -1,0 +1,121 @@
+<view class="recurrence-picker" wx:if="{{show}}">
+  <view class="picker-mask" bindtap="onCancel"></view>
+  <view class="picker-panel">
+    <view class="picker-header">
+      <text class="picker-cancel" bindtap="onCancel">取消</text>
+      <text class="picker-title">设置重复</text>
+      <text class="picker-confirm" bindtap="onConfirm">确定</text>
+    </view>
+
+    <!-- Type selection -->
+    <view class="type-grid">
+      <view
+        wx:for="{{typeOptions}}"
+        wx:key="value"
+        class="type-item {{localType === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onTypeSelect"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <!-- Interval -->
+    <view class="option-row" wx:if="{{localType !== 'none'}}">
+      <text class="option-label-flat">间隔</text>
+      <view class="interval-control">
+        <view class="interval-btn" data-value="{{localInterval - 1}}" bindtap="onIntervalChange" wx:if="{{localInterval > 1}}">−</view>
+        <text class="interval-value">{{localInterval}}</text>
+        <view class="interval-btn" data-value="{{localInterval + 1}}" bindtap="onIntervalChange">+</view>
+        <text class="interval-unit">{{localType === 'daily' ? '天' : localType === 'weekly' ? '周' : localType === 'monthly' ? '月' : localType === 'quarterly' ? '季度' : '年'}}</text>
+      </view>
+    </view>
+
+    <!-- Weekly: day of week -->
+    <view class="option-section" wx:if="{{localType === 'weekly'}}">
+      <text class="option-label">星期</text>
+      <view class="weekday-grid">
+        <view
+          wx:for="{{weekdayOptions}}"
+          wx:key="value"
+          class="weekday-item {{localDayOfWeek === item.value ? 'active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onWeekdaySelect"
+        >{{item.label}}</view>
+      </view>
+    </view>
+
+    <!-- Monthly: day of month -->
+    <view class="option-section" wx:if="{{localType === 'monthly'}}">
+      <text class="option-label">日期</text>
+      <view class="day-input-row">
+        <input class="day-input" type="number" value="{{localDayOfMonth}}" bindinput="onDayOfMonthInput" maxlength="2" />
+        <text class="day-unit">号</text>
+      </view>
+    </view>
+
+    <!-- Quarterly: 按周次 / 按日期 -->
+    <view class="option-section" wx:if="{{localType === 'quarterly'}}">
+      <text class="option-label">模式</text>
+      <view class="mode-row">
+        <view class="mode-btn {{localMode === 'week' ? 'active' : ''}}" data-mode="week" bindtap="onQuarterlyModeChange">按周次</view>
+        <view class="mode-btn {{localMode === 'date' ? 'active' : ''}}" data-mode="date" bindtap="onQuarterlyModeChange">按日期</view>
+      </view>
+
+      <!-- 按周次：选第几周 + 周几 -->
+      <block wx:if="{{localMode === 'week'}}">
+        <text class="option-sublabel">第几周（一个季度约 13 周）</text>
+        <scroll-view scroll-x class="week-scroll">
+          <view class="week-grid">
+            <view
+              wx:for="{{weekOfQuarterOptions}}"
+              wx:key="value"
+              class="week-item {{localWeekOfQuarter === item.value ? 'active' : ''}}"
+              data-value="{{item.value}}"
+              bindtap="onWeekOfQuarterSelect"
+            >{{item.label}}</view>
+          </view>
+        </scroll-view>
+
+        <text class="option-sublabel">星期几</text>
+        <view class="weekday-grid">
+          <view
+            wx:for="{{weekdayOptions}}"
+            wx:key="value"
+            class="weekday-item {{localDayOfWeek === item.value ? 'active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onWeekdaySelect"
+          >{{item.label}}</view>
+        </view>
+      </block>
+
+      <!-- 按日期：季度首月第 N 号 -->
+      <block wx:else>
+        <text class="option-sublabel">季度第一个月的日期</text>
+        <view class="day-input-row">
+          <input class="day-input" type="number" value="{{localDayOfMonth}}" bindinput="onDayOfMonthInput" maxlength="2" />
+          <text class="day-unit">号</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- Yearly: month + day -->
+    <view class="option-section" wx:if="{{localType === 'yearly'}}">
+      <text class="option-label">月份</text>
+      <view class="month-grid">
+        <view
+          wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}"
+          wx:key="*this"
+          class="month-item {{localMonthOfYear === item ? 'active' : ''}}"
+          data-value="{{item}}"
+          bindtap="onMonthSelect"
+        >{{item}}月</view>
+      </view>
+      <text class="option-sublabel">日期</text>
+      <view class="day-input-row">
+        <input class="day-input" type="number" value="{{localDayOfMonth}}" bindinput="onDayOfMonthInput" maxlength="2" />
+        <text class="day-unit">号</text>
+      </view>
+    </view>
+  </view>
+</view>

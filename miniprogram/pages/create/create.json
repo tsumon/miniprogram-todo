@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "recurrence-picker": "../../components/recurrence-picker/recurrence-picker"
+  },
+  "navigationBarTitleText": "新建任务"
+}

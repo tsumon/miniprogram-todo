@@ -1,0 +1,280 @@
+.complete-banner {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 0 24rpx 24rpx;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.complete-banner.done {
+  background: #f0faf4;
+}
+
+.complete-banner text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.complete-banner.done text {
+  color: #1D9E75;
+  font-weight: 500;
+}
+
+.check-circle {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 3rpx solid #d0d0d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.check-circle.checked {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.check-circle.checked .check-icon {
+  width: 18rpx;
+  height: 10rpx;
+  border-left: 4rpx solid #fff;
+  border-bottom: 4rpx solid #fff;
+  transform: rotate(-45deg) translate(2rpx, -2rpx);
+}
+
+.section {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin: 0 24rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title-input {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #2c2c2a;
+  padding: 8rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.title-input.done {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.title-placeholder {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.note-input {
+  width: 100%;
+  font-size: 28rpx;
+  color: #666;
+  margin-top: 24rpx;
+  min-height: 60rpx;
+  line-height: 1.6;
+}
+
+.note-placeholder {
+  color: #ccc;
+}
+
+.card-section {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 0 32rpx;
+  margin: 0 24rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.card-row:last-child {
+  border-bottom: none;
+}
+
+.card-label {
+  font-size: 30rpx;
+  color: #2c2c2a;
+  font-weight: 500;
+}
+
+.picker-value {
+  font-size: 28rpx;
+  color: var(--color-primary);
+}
+
+.priority-options {
+  display: flex;
+  gap: 16rpx;
+}
+
+.priority-option {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 32rpx;
+  background: #f5f6f8;
+  font-size: 24rpx;
+  color: #888;
+  transition: all 0.2s ease;
+}
+
+.priority-option.active {
+  background: #E6F1FB;
+  color: #185FA5;
+  font-weight: 600;
+}
+
+.priority-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.time-clear {
+  font-size: 24rpx;
+  color: #aaa;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 20rpx 0 28rpx;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 14rpx 28rpx;
+  border-radius: 32rpx;
+  background: #f5f6f8;
+  font-size: 24rpx;
+  color: #666;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.category-item.active {
+  background: #fff;
+  font-weight: 500;
+}
+
+.category-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+
+.meta-section {
+  padding: 24rpx 32rpx;
+}
+
+.meta-text {
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+/* Recurrence & birthday display */
+.recurrence-display {
+  display: flex;
+  align-items: center;
+}
+
+.recurrence-badge {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  background: #e8f0fc;
+  color: #4a90d9;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+.birthday-display {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.birthday-name-display {
+  font-size: 28rpx;
+  color: #222;
+}
+
+.calendar-badge {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  background: #f5f6f8;
+  color: #666;
+}
+
+.calendar-badge.lunar {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 24rpx;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.btn-delete {
+  height: 88rpx;
+  padding: 0 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fcebeb;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  color: #E24B4A;
+}
+
+.btn-save {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.btn-save:active {
+  background: #3A7FC9;
+}

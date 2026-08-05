@@ -1,0 +1,14 @@
+<view class="empty-state">
+  <view class="empty-icon">
+    <view class="icon-clipboard">
+      <view class="clip-top"></view>
+      <view class="clip-body">
+        <view class="clip-line"></view>
+        <view class="clip-line short"></view>
+        <view class="clip-line short"></view>
+      </view>
+    </view>
+  </view>
+  <text class="empty-text">{{text}}</text>
+  <text class="empty-subtext" wx:if="{{subtext}}">{{subtext}}</text>
+</view>

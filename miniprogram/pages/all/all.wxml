@@ -1,0 +1,77 @@
+<view class="container">
+  <!-- Search bar -->
+  <view class="search-bar">
+    <view class="search-icon"></view>
+    <input
+      class="search-input"
+      placeholder="搜索任务..."
+      value="{{searchValue}}"
+      bindinput="onSearch"
+      confirm-type="search"
+    />
+    <view wx:if="{{searchValue}}" class="search-clear" bindtap="onSearchClear">取消</view>
+  </view>
+
+  <!-- Tabs -->
+  <view class="tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      <text>{{item.label}}</text>
+      <view wx:if="{{activeTab === item.key}}" class="tab-indicator"></view>
+    </view>
+  </view>
+
+  <!-- Grouped task list (for all/upcoming) -->
+  <block wx:if="{{(activeTab === 'all' || activeTab === 'upcoming') && groupedTasks.length > 0}}">
+    <view wx:for="{{groupedTasks}}" wx:key="date" class="task-group">
+      <view class="group-header">
+        <text class="group-label">{{item.label}}</text>
+        <text class="group-count">{{item.tasks.length}}</text>
+      </view>
+      <view class="task-list card">
+        <task-item
+          wx:for="{{item.tasks}}"
+          wx:for-item="task"
+          wx:key="id"
+          task="{{task}}"
+          show-category="{{true}}"
+          bind:toggle="onToggle"
+          bind:tap="onTap"
+          bind:delete="onDelete"
+        />
+      </view>
+    </view>
+  </block>
+
+  <!-- Flat task list (for today/completed) -->
+  <block wx:elif="{{(activeTab === 'today' || activeTab === 'completed') && tasks.length > 0}}">
+    <view class="task-list card mx-32">
+      <task-item
+        wx:for="{{tasks}}"
+        wx:key="id"
+        task="{{item}}"
+        show-category="{{true}}"
+        bind:toggle="onToggle"
+        bind:tap="onTap"
+        bind:delete="onDelete"
+      />
+    </view>
+  </block>
+
+  <!-- Empty state -->
+  <empty-state
+    wx:elif="{{!loading}}"
+    text="{{searchValue ? '未找到相关任务' : '暂无任务'}}"
+    subtext="{{searchValue ? '试试其他关键词' : '点击右下角按钮添加新任务'}}"
+  />
+
+  <!-- FAB -->
+  <view class="fab" bindtap="onCreate">
+    <view class="fab-icon"></view>
+  </view>
+</view>

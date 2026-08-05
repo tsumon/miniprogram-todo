@@ -1,0 +1,197 @@
+<view class="container">
+  <!-- 厂商快捷配置 -->
+  <view class="section-title">一键配置厂商</view>
+  <scroll-view scroll-x class="preset-scroll" wx:if="{{presets.length > 0}}">
+    <view class="preset-row">
+      <view
+        wx:for="{{presets}}"
+        wx:key="id"
+        class="preset-card {{selectedPreset === item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onPresetTap"
+      >
+        <text class="preset-name">{{item.name}}</text>
+        <text class="preset-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 基础配置 -->
+  <view class="section-title">基础配置</view>
+  <view class="config-card card">
+    <!-- API Base URL -->
+    <view class="config-row">
+      <view class="config-label">
+        <text class="label-main">API 地址</text>
+        <text class="label-hint">OpenAI 兼容的 API Base URL</text>
+      </view>
+      <input
+        class="config-input"
+        placeholder="https://api.openai.com/v1"
+        placeholder-class="input-ph"
+        value="{{apiBaseUrl}}"
+        bindinput="onBaseUrlInput"
+      />
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- API Key -->
+    <view class="config-row">
+      <view class="config-label">
+        <text class="label-main">API Key</text>
+        <text class="label-hint">密钥将安全存储在本地</text>
+      </view>
+      <view class="key-row">
+        <input
+          class="config-input"
+          placeholder="sk-..."
+          placeholder-class="input-ph"
+          value="{{apiKey}}"
+          password="{{!showKey}}"
+          bindinput="onKeyInput"
+        />
+        <view class="eye-btn" bindtap="onToggleShowKey">
+          <text>{{showKey ? '隐藏' : '显示'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- Model -->
+    <view class="config-row">
+      <view class="config-label">
+        <text class="label-main">模型</text>
+        <text class="label-hint">选择或输入模型名称</text>
+      </view>
+      <input
+        class="config-input"
+        placeholder="gpt-4o-mini"
+        placeholder-class="input-ph"
+        value="{{model}}"
+        bindinput="onModelInput"
+      />
+    </view>
+
+    <!-- Model quick select -->
+    <view class="model-chips">
+      <view
+        wx:for="{{modelOptions}}"
+        wx:key="*this"
+        class="model-chip {{model === item ? 'active' : ''}}"
+        data-value="{{item}}"
+        bindtap="onModelSelect"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 测试按钮 -->
+  <view class="test-section">
+    <view class="btn-test {{testing ? 'testing' : ''}}" bindtap="onTest">
+      {{testing ? '测试中...' : '测试连接'}}
+    </view>
+    <view class="test-result {{testStatus}}" wx:if="{{testResult}}">
+      <text>{{testResult}}</text>
+    </view>
+  </view>
+
+  <!-- 高级配置 -->
+  <view class="advanced-header" bindtap="onToggleAdvanced">
+    <text class="advanced-title">高级配置</text>
+    <view class="advanced-arrow {{showAdvanced ? 'open' : ''}}"></view>
+  </view>
+
+  <view class="config-card card" wx:if="{{showAdvanced}}">
+    <!-- STT URL -->
+    <view class="config-row">
+      <view class="config-label">
+        <text class="label-main">语音转文字端点</text>
+        <text class="label-hint">用于语音输入，留空则不启用语音</text>
+      </view>
+      <input
+        class="config-input"
+        placeholder="https://api.example.com/v1/audio/transcriptions"
+        placeholder-class="input-ph"
+        value="{{sttUrl}}"
+        bindinput="onSttUrlInput"
+      />
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- System Prompt -->
+    <view class="config-row" style="flex-direction: column; align-items: stretch;">
+      <view class="config-label" style="flex-direction: row; align-items: center; justify-content: space-between;">
+        <view>
+          <text class="label-main">自定义 System Prompt</text>
+          <text class="label-hint">留空则使用默认提示词</text>
+        </view>
+        <view class="prompt-toggle" bindtap="onToggleSystemPrompt">
+          {{showSystemPrompt ? '收起' : '展开'}}
+        </view>
+      </view>
+      <textarea
+        wx:if="{{showSystemPrompt}}"
+        class="config-textarea"
+        placeholder="输入自定义提示词..."
+        placeholder-class="input-ph"
+        value="{{systemPrompt}}"
+        bindinput="onSystemPromptInput"
+        maxlength="2000"
+        auto-height
+      />
+      <view class="prompt-actions" wx:if="{{showSystemPrompt}}">
+        <view class="prompt-reset" bindtap="onResetPrompt">重置为默认</view>
+      </view>
+    </view>
+
+    <!-- 订阅消息模板 ID -->
+    <view class="divider"></view>
+    <view class="config-row">
+      <view class="config-label">
+        <text class="label-main">订阅消息模板 ID</text>
+        <text class="label-hint">用于申请推送权限（需服务端定时下发）</text>
+      </view>
+      <input
+        class="config-input"
+        placeholder="如：ABC123..."
+        placeholder-class="input-ph"
+        value="{{tmplId}}"
+        bindinput="onTmplIdInput"
+      />
+    </view>
+    <view class="subscribe-btn" bindtap="onRequestSubscribe">申请消息推送权限</view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="help-section">
+    <view class="help-title">使用说明</view>
+    <view class="help-item">
+      <text class="help-num">1</text>
+      <text class="help-text">填写 API 地址和密钥（支持 OpenAI / DeepSeek / 通义千问 等兼容接口）</text>
+    </view>
+    <view class="help-item">
+      <text class="help-num">2</text>
+      <text class="help-text">选择或输入模型名称，推荐使用 gpt-4o-mini 性价比最高</text>
+    </view>
+    <view class="help-item">
+      <text class="help-num">3</text>
+      <text class="help-text">点击"测试连接"验证配置是否正确</text>
+    </view>
+    <view class="help-item">
+      <text class="help-num">4</text>
+      <text class="help-text">如需语音输入，在高级配置中填写语音转文字端点</text>
+    </view>
+    <view class="help-item">
+      <text class="help-num">5</text>
+      <text class="help-text">配置完成后，在首页点击 AI 按钮即可智能创建任务</text>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="bottom-actions">
+    <view class="btn-clear" bindtap="onClear">清除配置</view>
+    <view class="btn-save" bindtap="onSave">保存配置</view>
+  </view>
+</view>

@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "task-item": "/components/task-item/task-item",
+    "empty-state": "/components/empty-state/empty-state"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

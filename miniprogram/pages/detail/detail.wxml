@@ -1,0 +1,139 @@
+<view class="container" wx:if="{{task}}">
+  <!-- Complete toggle banner -->
+  <view class="complete-banner {{completed ? 'done' : ''}}" bindtap="onToggleComplete">
+    <view class="check-circle {{completed ? 'checked' : ''}}">
+      <view wx:if="{{completed}}" class="check-icon"></view>
+    </view>
+    <text>{{completed ? '已完成' : '点击标记为完成'}}</text>
+  </view>
+
+  <!-- Title & Note -->
+  <view class="section">
+    <input
+      class="title-input {{completed ? 'done' : ''}}"
+      placeholder="任务标题"
+      placeholder-class="title-placeholder"
+      value="{{title}}"
+      bindinput="onTitleInput"
+      maxlength="100"
+    />
+    <textarea
+      class="note-input"
+      placeholder="添加备注..."
+      placeholder-class="note-placeholder"
+      value="{{note}}"
+      bindinput="onNoteInput"
+      maxlength="500"
+      auto-height
+    />
+  </view>
+
+  <!-- Priority -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">优先级</text>
+      <view class="priority-options">
+        <view
+          wx:for="{{priorityOptions}}"
+          wx:key="value"
+          class="priority-option {{priority === item.value ? 'active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onPrioritySelect"
+        >
+          <view class="priority-dot" style="background: {{item.color}}"></view>
+          <text wx:if="{{item.value > 0}}">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Date & Time -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">日期</text>
+      <picker mode="date" value="{{dueDate}}" bindchange="onDateChange">
+        <view class="picker-value">{{dateLabel}}</view>
+      </picker>
+    </view>
+    <view class="card-row">
+      <text class="card-label">时间</text>
+      <view class="time-row">
+        <block wx:if="{{dueTime}}">
+          <picker mode="time" value="{{dueTime}}" bindchange="onTimeChange">
+            <view class="picker-value">{{dueTime}}</view>
+          </picker>
+          <text class="time-clear" bindtap="onTimeToggle">清除</text>
+        </block>
+        <picker wx:else mode="time" value="09:00" bindchange="onTimeChange">
+          <view class="picker-value text-tertiary">设置时间</view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <!-- Category -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">分类</text>
+    </view>
+    <view class="category-grid">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="category-item {{category === item.id ? 'active' : ''}}"
+        style="{{category === item.id ? 'border-color:' + item.color + '; color:' + item.color : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onCategorySelect"
+      >
+        <view class="category-dot" style="background: {{item.color}}"></view>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Recurrence info -->
+  <view class="card-section" wx:if="{{recurrenceLabel}}">
+    <view class="card-row">
+      <text class="card-label">重复</text>
+      <view class="recurrence-display">
+        <text class="recurrence-badge">{{recurrenceLabel}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Reminder info -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">提醒</text>
+      <view class="picker-value">{{reminderLabel}}</view>
+    </view>
+  </view>
+
+  <!-- Birthday info -->
+  <view class="card-section" wx:if="{{isBirthday}}">
+    <view class="card-row">
+      <text class="card-label">生日提醒</text>
+      <view class="birthday-display">
+        <text class="birthday-name-display">{{birthdayName || '生日'}}</text>
+        <text class="calendar-badge {{calendarType === 'lunar' ? 'lunar' : ''}}">{{calendarType === 'lunar' ? '农历' : '公历'}}</text>
+      </view>
+    </view>
+    <view class="card-row" wx:if="{{lunarLabel}}">
+      <text class="card-label">农历日期</text>
+      <text class="picker-value">{{lunarLabel}}</text>
+    </view>
+  </view>
+
+  <!-- Meta info -->
+  <view class="meta-section" wx:if="{{createdAt}}">
+    <text class="meta-text">创建于 {{createdAt}}</text>
+  </view>
+
+  <!-- Bottom actions -->
+  <view class="bottom-actions">
+    <view class="btn-delete" bindtap="onDelete">
+      <text>删除任务</text>
+    </view>
+    <view class="btn-save" bindtap="onSave">保存修改</view>
+  </view>
+</view>

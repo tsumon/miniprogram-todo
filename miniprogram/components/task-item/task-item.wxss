@@ -1,0 +1,186 @@
+/* ==================== Task Item 容器 ==================== */
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: opacity 0.2s ease;
+}
+
+.task-item.completed {
+  opacity: 0.5;
+}
+
+/* ==================== 左侧固定区（勾选 + 优先级点）==================== */
+.task-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-shrink: 0;
+  margin-top: 4rpx; /* 微调与标题第一行对齐 */
+}
+
+.check-circle {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 3rpx solid #d0d0d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.check-circle.checked {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.check-circle.checked .check-icon {
+  width: 18rpx;
+  height: 10rpx;
+  border-left: 4rpx solid #fff;
+  border-bottom: 4rpx solid #fff;
+  transform: rotate(-45deg) translate(2rpx, -2rpx);
+}
+
+.priority-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==================== 右侧内容区 ==================== */
+.task-right {
+  flex: 1;
+  min-width: 0; /* 防止内容撑开 */
+  margin-left: 8rpx;
+}
+
+/* ---- 标题行 ---- */
+.task-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.task-title {
+  font-size: 30rpx;
+  color: #2c2c2a;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.completed .task-title {
+  text-decoration: line-through;
+  color: #888;
+}
+
+/* 分类标签 */
+.meta-tag {
+  font-size: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* 删除按钮 */
+.task-delete {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.25;
+  transition: opacity 0.2s;
+}
+
+.task-delete:active {
+  opacity: 0.6;
+}
+
+.task-delete .delete-icon {
+  width: 24rpx;
+  height: 24rpx;
+  position: relative;
+}
+
+.task-delete .delete-icon::before,
+.task-delete .delete-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 3rpx;
+  background: #999;
+  border-radius: 2rpx;
+}
+
+.task-delete .delete-icon::before {
+  transform: rotate(45deg);
+}
+
+.task-delete .delete-icon::after {
+  transform: rotate(-45deg);
+}
+
+/* ---- 元信息行（周期/生日/日期/备注）---- */
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 8rpx;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.meta-date {
+  font-size: 24rpx;
+  color: #888;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.meta-date.overdue {
+  color: #E24B4A;
+  font-weight: 500;
+}
+
+.meta-note {
+  font-size: 24rpx;
+  color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* 徽章 */
+.meta-badge {
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 6rpx;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.meta-badge.recurrence {
+  background: #e8f0fc;
+  color: #4a90d9;
+}
+
+.meta-badge.birthday {
+  background: #fff3e0;
+  color: #e65100;
+}

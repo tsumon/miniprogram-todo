@@ -1,0 +1,34 @@
+<view class="task-item {{task.completed ? 'completed' : ''}}" bindtap="onTap">
+  <!-- 左侧固定区：勾选 + 优先级点 -->
+  <view class="task-left">
+    <view class="check-circle {{task.completed ? 'checked' : ''}}" catchtap="onToggle">
+      <view wx:if="{{task.completed}}" class="check-icon"></view>
+    </view>
+    <view
+      class="priority-dot"
+      style="background: {{priorityColors[task.priority]}}"
+    ></view>
+  </view>
+
+  <!-- 右侧内容区：标题行 + 元信息行 -->
+  <view class="task-right">
+    <!-- 标题行 -->
+    <view class="task-title-row">
+      <text class="task-title">{{task.title}}</text>
+      <text wx:if="{{showCategory && task.categoryName}}" class="meta-tag" style="color: {{task.categoryColor}}; border-color: {{task.categoryColor}}">
+        {{task.categoryName}}
+      </text>
+      <view class="task-delete" catchtap="onDelete">
+        <view class="delete-icon"></view>
+      </view>
+    </view>
+
+    <!-- 元信息行 -->
+    <view class="task-meta" wx:if="{{task.note || task.dueDate || task.recurrenceLabel || task.isBirthday}}">
+      <text wx:if="{{task.isBirthday}}" class="meta-badge birthday">{{task.birthdayName ? task.birthdayName + '生日' : '生日'}}</text>
+      <text wx:if="{{task.recurrenceLabel}}" class="meta-badge recurrence">{{task.recurrenceLabel}}</text>
+      <text wx:if="{{task.dueDate}}" class="meta-date {{task.isOverdue ? 'overdue' : ''}}">{{task.dueDateLabel}}{{task.dueTime ? ' ' + task.dueTime : ''}}</text>
+      <text wx:if="{{task.note}}" class="meta-note">{{task.note}}</text>
+    </view>
+  </view>
+</view>

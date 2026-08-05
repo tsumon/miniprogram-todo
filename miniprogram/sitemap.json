@@ -1,0 +1,9 @@
+{
+  "desc": "About this file, refer to https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/sitemap.html",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

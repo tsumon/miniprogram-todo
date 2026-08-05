@@ -1,0 +1,103 @@
+<view class="container">
+  <!-- User header -->
+  <view class="user-header">
+    <view class="avatar">
+      <view class="avatar-icon"></view>
+    </view>
+    <view class="user-info">
+      <text class="user-name">Todo 用户</text>
+      <text class="user-date">{{todayLabel}}</text>
+    </view>
+  </view>
+
+  <!-- Stats cards -->
+  <view class="stats-grid">
+    <view class="stat-card">
+      <text class="stat-value">{{stats.total}}</text>
+      <text class="stat-label">总任务</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value text-success">{{stats.completed}}</text>
+      <text class="stat-label">已完成</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value text-warning">{{stats.pending}}</text>
+      <text class="stat-label">待完成</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value text-accent">{{stats.streak}}</text>
+      <text class="stat-label">连续天数</text>
+    </view>
+  </view>
+
+  <!-- Today progress -->
+  <view class="progress-card card">
+    <view class="progress-header">
+      <text class="progress-title">今日进度</text>
+      <text class="progress-percent">{{todayPercent}}%</text>
+    </view>
+    <view class="progress-track">
+      <view
+        class="progress-fill"
+        style="width: {{todayPercent}}%"
+      ></view>
+    </view>
+    <view class="progress-detail">
+      <text>{{stats.todayCompleted}} / {{stats.todayTotal}} 完成</text>
+      <text wx:if="{{stats.overdue > 0}}" class="text-danger">{{stats.overdue}} 个逾期</text>
+    </view>
+  </view>
+
+  <!-- Completion rate -->
+  <view class="rate-card card">
+    <view class="rate-circle">
+      <text class="rate-num">{{stats.completionRate}}</text>
+      <text class="rate-unit">%</text>
+    </view>
+    <view class="rate-info">
+      <text class="rate-title">总完成率</text>
+      <text class="rate-desc">已完成 {{stats.completed}} 个任务</text>
+    </view>
+  </view>
+
+  <!-- Actions -->
+  <view class="action-list card">
+    <view class="action-item ai-action" bindtap="onAIInput">
+      <view class="action-icon icon-ai">AI</view>
+      <view class="action-text-group">
+        <text class="action-label">AI 创建任务</text>
+        <text class="action-desc">语音/文字智能识别</text>
+      </view>
+      <view class="action-arrow"></view>
+    </view>
+    <view class="action-item" bindtap="onSettings">
+      <view class="action-icon icon-settings"></view>
+      <text class="action-label">AI 设置</text>
+      <view class="action-arrow"></view>
+    </view>
+    <view class="action-item" bindtap="onClearCompleted">
+      <view class="action-icon icon-clean"></view>
+      <text class="action-label">清理已完成</text>
+      <view class="action-arrow"></view>
+    </view>
+    <button class="action-item share-btn" open-type="share">
+      <view class="action-icon icon-share"></view>
+      <text class="action-label">分享给好友</text>
+      <view class="action-arrow"></view>
+    </button>
+    <view class="action-item" bindtap="onFeedback">
+      <view class="action-icon icon-feedback"></view>
+      <text class="action-label">意见反馈</text>
+      <view class="action-arrow"></view>
+    </view>
+    <view class="action-item" bindtap="onAbout">
+      <view class="action-icon icon-about"></view>
+      <text class="action-label">关于</text>
+      <view class="action-arrow"></view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <text>Todo 清单 v1.0.0</text>
+  </view>
+</view>

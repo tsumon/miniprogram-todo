@@ -1,0 +1,181 @@
+<view class="container">
+  <!-- AI 快捷入口 -->
+  <view class="ai-entry" bindtap="onGoAIInput">
+    <view class="ai-entry-icon">AI</view>
+    <text class="ai-entry-text">用 AI 创建任务（语音/文字）</text>
+    <view class="ai-entry-arrow"></view>
+  </view>
+
+  <!-- Title input -->
+  <view class="section">
+    <input
+      class="title-input"
+      placeholder="任务标题"
+      placeholder-class="title-placeholder"
+      value="{{title}}"
+      bindinput="onTitleInput"
+      maxlength="100"
+      auto-focus
+    />
+    <textarea
+      class="note-input"
+      placeholder="添加备注..."
+      placeholder-class="note-placeholder"
+      value="{{note}}"
+      bindinput="onNoteInput"
+      maxlength="500"
+      auto-height
+    />
+  </view>
+
+  <!-- Priority -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">优先级</text>
+      <view class="priority-options">
+        <view
+          wx:for="{{priorityOptions}}"
+          wx:key="value"
+          class="priority-option {{priority === item.value ? 'active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onPrioritySelect"
+        >
+          <view class="priority-dot" style="background: {{item.color}}"></view>
+          <text wx:if="{{item.value > 0}}">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Date -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">日期</text>
+      <picker mode="date" value="{{dueDate}}" bindchange="onDateChange">
+        <view class="picker-value">{{dateLabel}}</view>
+      </picker>
+    </view>
+
+    <!-- Quick dates -->
+    <view class="quick-dates">
+      <view
+        wx:for="{{quickDates}}"
+        wx:key="date"
+        class="quick-date {{dueDate === item.date ? 'active' : ''}}"
+        data-date="{{item.date}}"
+        data-label="{{item.label}}"
+        bindtap="onQuickDateSelect"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <!-- Time -->
+    <view class="card-row">
+      <text class="card-label">时间</text>
+      <view class="time-row">
+        <picker mode="time" value="{{dueTime || '09:00'}}" bindchange="onTimeChange" wx:if="{{!dueTime}}">
+          <view class="picker-value text-tertiary">设置时间</view>
+        </picker>
+        <block wx:else>
+          <picker mode="time" value="{{dueTime}}" bindchange="onTimeChange">
+            <view class="picker-value">{{dueTime}}</view>
+          </picker>
+          <text class="time-clear" bindtap="onTimeToggle">清除</text>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- Recurrence -->
+  <view class="card-section">
+    <view class="card-row" bindtap="onShowRecurrencePicker">
+      <text class="card-label">重复</text>
+      <view class="picker-value {{!recurrenceLabel ? 'text-tertiary' : ''}}">
+        {{recurrenceLabel || '不重复'}}
+      </view>
+      <view class="card-arrow"></view>
+    </view>
+  </view>
+
+  <!-- Reminder -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">提醒</text>
+    </view>
+    <view class="reminder-options">
+      <view
+        wx:for="{{reminderOptions}}"
+        wx:key="label"
+        class="reminder-chip {{reminderOffset === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onReminderSelect"
+      >{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- Category -->
+  <view class="card-section">
+    <view class="card-row">
+      <text class="card-label">分类</text>
+    </view>
+    <view class="category-grid">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="category-item {{category === item.id ? 'active' : ''}}"
+        style="{{category === item.id ? 'border-color:' + item.color + '; color:' + item.color : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onCategorySelect"
+      >
+        <view class="category-dot" style="background: {{item.color}}"></view>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Birthday reminder -->
+  <view class="card-section">
+    <view class="card-row" bindtap="onToggleBirthday">
+      <text class="card-label">生日提醒</text>
+      <view class="switch-toggle {{isBirthday ? 'on' : ''}}">
+        <view class="switch-knob"></view>
+      </view>
+    </view>
+    <block wx:if="{{isBirthday}}">
+      <view class="card-row">
+        <text class="card-label">姓名</text>
+        <input
+          class="birthday-name"
+          placeholder="生日主人"
+          value="{{birthdayName}}"
+          bindinput="onBirthdayNameInput"
+          maxlength="20"
+        />
+      </view>
+      <view class="card-row" bindtap="onToggleCalendarType">
+        <text class="card-label">历法</text>
+        <view class="calendar-toggle {{calendarType === 'lunar' ? 'lunar' : ''}}">
+          {{calendarType === 'lunar' ? '农历' : '公历'}}
+        </view>
+      </view>
+      <view class="birthday-hint" wx:if="{{calendarType === 'lunar'}}">
+        农历模式：到期日将按农历自动跨年计算
+      </view>
+    </block>
+  </view>
+
+  <!-- Bottom actions -->
+  <view class="bottom-actions">
+    <view class="btn-cancel" bindtap="onCancel">取消</view>
+    <view class="btn-save" bindtap="onSave">保存</view>
+  </view>
+</view>
+
+<!-- Recurrence picker -->
+<recurrence-picker
+  show="{{showRecurrencePicker}}"
+  recurrence="{{recurrence}}"
+  bind:confirm="onRecurrenceConfirm"
+  bind:cancel="onRecurrenceCancel"
+/>

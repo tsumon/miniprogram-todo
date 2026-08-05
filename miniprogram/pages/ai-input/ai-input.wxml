@@ -1,0 +1,196 @@
+<view class="container">
+  <!-- 未配置 API 提示 -->
+  <view class="no-config-banner" wx:if="{{!hasApiConfig}}">
+    <view class="banner-icon"></view>
+    <view class="banner-text">
+      <text class="banner-title">未配置 AI API</text>
+      <text class="banner-desc">配置第三方 API 后即可使用 AI 智能创建任务</text>
+    </view>
+    <view class="banner-btn" bindtap="onGoSettings">去配置</view>
+  </view>
+
+  <!-- 输入区 -->
+  <view class="input-section card">
+    <textarea
+      class="text-input"
+      placeholder="说说你要做什么...&#10;例：明天下午3点开会"
+      placeholder-class="input-placeholder"
+      value="{{inputText}}"
+      bindinput="onTextInput"
+      maxlength="500"
+      auto-height
+      disabled="{{isRecording || isProcessing}}"
+      wx:if="{{!showResult}}"
+    />
+
+    <view class="input-actions" wx:if="{{!showResult && !isProcessing}}">
+      <view class="action-voice {{isRecording ? 'recording' : ''}}"
+        bindtap="{{isRecording ? 'onStopRecording' : 'onStartRecording'}}"
+      >
+        <view class="voice-icon {{isRecording ? 'recording-anim' : ''}}"></view>
+        <text class="voice-label">{{isRecording ? '点击停止' : '语音输入'}}</text>
+      </view>
+
+      <view class="action-clear" wx:if="{{inputText}}" bindtap="onClearInput">
+        <text>清空</text>
+      </view>
+
+      <view class="action-parse {{!inputText ? 'disabled' : ''}}" bindtap="onParse">
+        <text>AI 解析</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 录音状态 -->
+  <view class="recording-overlay" wx:if="{{isRecording}}">
+    <view class="recording-waves">
+      <view class="wave-bar" wx:for="{{[1,2,3,4,5,6,7]}}" wx:key="*this" style="animation-delay: {{item * 0.1}}s"></view>
+    </view>
+    <text class="recording-text">正在录音...</text>
+    <view class="recording-stop" bindtap="onStopRecording">停止</view>
+  </view>
+
+  <!-- 处理中 -->
+  <view class="processing-overlay" wx:if="{{isProcessing}}">
+    <view class="processing-spinner"></view>
+    <text class="processing-text">{{processStep || '处理中...'}}</text>
+  </view>
+
+  <!-- 示例 -->
+  <view class="examples-section" wx:if="{{!showResult && !inputText && !isProcessing}}">
+    <text class="examples-title">试试这些示例</text>
+    <view class="examples-list">
+      <view
+        wx:for="{{examples}}"
+        wx:key="*this"
+        class="example-item"
+        data-text="{{item}}"
+        bindtap="onExampleTap"
+      >
+        <text class="example-icon">AI</text>
+        <text class="example-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 解析结果 -->
+  <view class="result-section" wx:if="{{showResult}}">
+    <view class="result-header">
+      <view class="result-badge">AI 已解析</view>
+      <text class="result-hint">请确认信息无误后创建</text>
+    </view>
+
+    <!-- 标题 -->
+    <view class="edit-card card">
+      <input
+        class="edit-title"
+        value="{{editTitle}}"
+        bindinput="onEditTitle"
+        placeholder="任务标题"
+        maxlength="100"
+      />
+      <textarea
+        class="edit-note"
+        value="{{editNote}}"
+        bindinput="onEditNote"
+        placeholder="备注（可选）"
+        maxlength="500"
+        auto-height
+      />
+    </view>
+
+    <!-- 属性 -->
+    <view class="edit-card card">
+      <!-- 优先级 -->
+      <view class="edit-row">
+        <text class="edit-label">优先级</text>
+        <view class="priority-options">
+          <view
+            wx:for="{{priorityOptions}}"
+            wx:key="value"
+            class="priority-opt {{editPriority === item.value ? 'active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onEditPriority"
+          >
+            <view class="priority-dot" style="background: {{item.color}}"></view>
+            <text wx:if="{{item.value > 0}}">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 日期 -->
+      <view class="edit-row">
+        <text class="edit-label">日期</text>
+        <picker mode="date" value="{{editDueDate}}" bindchange="onEditDate">
+          <view class="edit-value">{{editDueDate || '未设置'}}</view>
+        </picker>
+      </view>
+
+      <!-- 时间 -->
+      <view class="edit-row">
+        <text class="edit-label">时间</text>
+        <picker mode="time" value="{{editDueTime || '09:00'}}" bindchange="onEditTime">
+          <view class="edit-value">{{editDueTime || '设置时间'}}</view>
+        </picker>
+      </view>
+
+      <!-- 分类 -->
+      <view class="edit-row">
+        <text class="edit-label">分类</text>
+        <view class="category-options">
+          <view
+            wx:for="{{categories}}"
+            wx:key="id"
+            class="category-opt {{editCategory === item.id ? 'active' : ''}}"
+            style="{{editCategory === item.id ? 'border-color:' + item.color + ';color:' + item.color : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onEditCategory"
+          >
+            <view class="cat-dot" style="background: {{item.color}}"></view>
+            <text>{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 重复 -->
+      <view class="edit-row" bindtap="onShowRecurrencePicker">
+        <text class="edit-label">重复</text>
+        <view class="edit-value {{!recurrenceLabel ? 'placeholder' : ''}}">
+          {{recurrenceLabel || '不重复'}}
+          <view class="edit-arrow"></view>
+        </view>
+      </view>
+
+      <!-- 生日提醒 -->
+      <view class="edit-row" wx:if="{{editIsBirthday}}">
+        <text class="edit-label">生日</text>
+        <view class="birthday-info">
+          <input
+            class="birthday-name-input"
+            value="{{editBirthdayName}}"
+            bindinput="onEditBirthdayName"
+            placeholder="姓名"
+            maxlength="20"
+          />
+          <view class="calendar-toggle {{editCalendarType === 'lunar' ? 'lunar' : ''}}" bindtap="onToggleCalendarType">
+            {{editCalendarType === 'lunar' ? '农历' : '公历'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="result-actions">
+      <view class="btn-discard" bindtap="onDiscard">放弃</view>
+      <view class="btn-create" bindtap="onConfirmCreate">创建任务</view>
+    </view>
+  </view>
+
+  <!-- 重复选择器 -->
+  <recurrence-picker
+    show="{{showRecurrencePicker}}"
+    recurrence="{{editRecurrence}}"
+    bind:confirm="onRecurrenceConfirm"
+    bind:cancel="onRecurrenceCancel"
+  />
+</view>

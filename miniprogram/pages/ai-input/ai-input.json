@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "AI 创建任务",
+  "usingComponents": {
+    "recurrence-picker": "../../components/recurrence-picker/recurrence-picker"
+  }
+}

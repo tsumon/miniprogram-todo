@@ -1,0 +1,125 @@
+<view class="container">
+  <!-- Header -->
+  <view class="header">
+    <view class="header-greeting">{{greeting}}</view>
+    <view class="header-date">{{todayLabel}}</view>
+    <view class="header-stats" wx:if="{{stats.todayTotal > 0}}">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.todayPending}}</text>
+        <text class="stat-label">待完成</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num text-success">{{stats.todayCompleted}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num text-danger" wx:if="{{stats.overdue > 0}}">{{stats.overdue}}</text>
+        <text class="stat-num" wx:else>0</text>
+        <text class="stat-label">逾期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Reminder banner -->
+  <view class="reminder-banner" wx:if="{{pendingReminders > 0}}" bindtap="onShowReminders">
+    <view class="reminder-bell">🔔</view>
+    <view class="reminder-banner-text">
+      <text class="reminder-banner-title">你有 {{pendingReminders}} 个任务待提醒</text>
+      <text class="reminder-banner-sub">点击查看，手动完成才会停止提醒</text>
+    </view>
+    <view class="reminder-banner-arrow"></view>
+  </view>
+
+  <!-- Progress bar -->
+  <view class="progress-bar" wx:if="{{stats.todayTotal > 0}}">
+    <view class="progress-track">
+      <view
+        class="progress-fill"
+        style="width: {{todayProgress}}%"
+      ></view>
+    </view>
+    <text class="progress-text">
+      {{stats.todayCompleted}}/{{stats.todayTotal}} 已完成
+    </text>
+  </view>
+
+  <!-- Overdue section -->
+  <view class="section" wx:if="{{overdueTasks.length > 0}}">
+    <view class="section-header">
+      <text class="section-title text-danger">逾期任务</text>
+      <text class="section-count">{{overdueTasks.length}}</text>
+    </view>
+    <view class="task-list card">
+      <task-item
+        wx:for="{{overdueTasks}}"
+        wx:key="id"
+        task="{{item}}"
+        show-category="{{true}}"
+        bind:toggle="onToggle"
+        bind:tap="onTap"
+        bind:delete="onDelete"
+      />
+    </view>
+  </view>
+
+  <!-- Today section -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">今天</text>
+      <text class="section-count">{{todayTasks.length}}</text>
+    </view>
+
+    <view wx:if="{{todayTasks.length > 0}}" class="task-list card">
+      <task-item
+        wx:for="{{todayTasks}}"
+        wx:key="id"
+        task="{{item}}"
+        show-category="{{true}}"
+        bind:toggle="onToggle"
+        bind:tap="onTap"
+        bind:delete="onDelete"
+      />
+    </view>
+
+    <empty-state
+      wx:elif="{{!loading && overdueTasks.length === 0 && completedTasks.length === 0}}"
+      text="今天没有待办任务"
+      subtext="享受轻松的一天，或添加新任务"
+    />
+
+    <view wx:elif="{{!loading && todayTasks.length === 0 && completedTasks.length > 0}}" class="all-done">
+      <text class="all-done-text">今天的任务都完成了!</text>
+    </view>
+  </view>
+
+  <!-- Completed section -->
+  <view class="section" wx:if="{{completedTasks.length > 0}}">
+    <view class="section-header">
+      <text class="section-title text-tertiary">已完成</text>
+      <text class="section-count text-tertiary">{{completedTasks.length}}</text>
+    </view>
+    <view class="task-list card">
+      <task-item
+        wx:for="{{completedTasks}}"
+        wx:key="id"
+        task="{{item}}"
+        show-category="{{true}}"
+        bind:toggle="onToggle"
+        bind:tap="onTap"
+        bind:delete="onDelete"
+      />
+    </view>
+  </view>
+
+  <!-- FAB -->
+  <view class="fab-group">
+    <view class="fab-ai" bindtap="onAIInput">
+      <view class="fab-ai-text">AI</view>
+    </view>
+    <view class="fab" bindtap="onCreate">
+      <view class="fab-icon"></view>
+    </view>
+  </view>
+</view>
