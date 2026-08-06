@@ -84,6 +84,33 @@
         bindtap="onModelSelect"
       >{{item}}</view>
     </view>
+
+    <view class="divider"></view>
+
+    <!-- AI 调用方式 -->
+    <view class="config-row" style="flex-direction: column; align-items: stretch;">
+      <view class="config-label" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
+        <view>
+          <text class="label-main">AI 调用方式</text>
+          <text class="label-hint">云函数转发免服务器域名，自用推荐</text>
+        </view>
+      </view>
+      <view class="seg">
+        <view
+          class="seg-item {{aiMode === 'direct' ? 'active' : ''}}"
+          data-mode="direct"
+          bindtap="onAIModeChange"
+        >直连</view>
+        <view
+          class="seg-item {{aiMode === 'cloud' ? 'active' : ''}}"
+          data-mode="cloud"
+          bindtap="onAIModeChange"
+        >云函数</view>
+      </view>
+      <view class="seg-hint" wx:if="{{aiMode === 'cloud'}}">
+        需在开发者工具开通云开发并部署 aiProxy 云函数（见 cloudfunctions/aiProxy）
+      </view>
+    </view>
   </view>
 
   <!-- 测试按钮 -->
@@ -94,6 +121,73 @@
     <view class="test-result {{testStatus}}" wx:if="{{testResult}}">
       <text>{{testResult}}</text>
     </view>
+  </view>
+
+  <!-- 服务通知推送 -->
+  <view class="section-title">服务通知推送</view>
+  <view class="config-card card">
+    <view class="config-row" style="flex-direction: column; align-items: stretch;">
+      <view class="config-label" style="flex-direction: row; align-items: center; justify-content: space-between;">
+        <view>
+          <text class="label-main">微信服务通知</text>
+          <text class="label-hint">关闭小程序也能收到提醒（需云开发）</text>
+        </view>
+      </view>
+      <view class="seg">
+        <view
+          class="seg-item {{pushEnabled ? 'active' : ''}}"
+          data-val="true"
+          bindtap="onPushEnabledChange"
+        >开启</view>
+        <view
+          class="seg-item {{!pushEnabled ? 'active' : ''}}"
+          data-val="false"
+          bindtap="onPushEnabledChange"
+        >关闭</view>
+      </view>
+    </view>
+
+    <block wx:if="{{pushEnabled}}">
+      <view class="divider"></view>
+      <view class="config-row">
+        <view class="config-label">
+          <text class="label-main">订阅消息模板 ID</text>
+          <text class="label-hint">公众平台 → 订阅消息 → 公共模板库，申请「日程提醒」类模板后复制 ID 填入</text>
+        </view>
+        <input
+          class="config-input"
+          placeholder="如：AbC123..."
+          placeholder-class="input-ph"
+          value="{{tmplId}}"
+          bindinput="onTmplIdInput"
+        />
+      </view>
+
+      <view class="divider"></view>
+      <view class="config-row">
+        <view class="config-label">
+          <text class="label-main">云环境 ID</text>
+          <text class="label-hint">开通云开发后在「云开发控制台 - 设置」查看</text>
+        </view>
+        <input
+          class="config-input"
+          placeholder="cloud1-xxxxxxxx"
+          placeholder-class="input-ph"
+          value="{{cloudEnv}}"
+          bindinput="onCloudEnvInput"
+        />
+      </view>
+
+      <view class="divider"></view>
+      <view class="push-actions">
+        <view class="btn-push" bindtap="onSyncNow">立即同步任务</view>
+        <view class="btn-push btn-push-outline" bindtap="onRequestSubscribe">申请推送权限</view>
+      </view>
+      <view class="push-tips">
+        微信「一次性订阅」规则：每次点允许只获得 1 次推送机会，所以打开小程序时会自动帮你申请，每天攒 1 次。
+        需部署 syncReminders（同步）+ pushReminders（定时推送）两个云函数，详见部署说明。
+      </view>
+    </block>
   </view>
 
   <!-- 高级配置 -->
@@ -115,6 +209,23 @@
         placeholder-class="input-ph"
         value="{{sttUrl}}"
         bindinput="onSttUrlInput"
+      />
+    </view>
+
+    <view class="divider" wx:if="{{aiMode === 'cloud'}}"></view>
+
+    <!-- 云环境 ID（仅云函数模式需要） -->
+    <view class="config-row" wx:if="{{aiMode === 'cloud'}}">
+      <view class="config-label">
+        <text class="label-main">云开发环境 ID</text>
+        <text class="label-hint">云函数模式必填，格式如 cloud1-xxxx</text>
+      </view>
+      <input
+        class="config-input"
+        placeholder="cloud1-xxxxxxxx"
+        placeholder-class="input-ph"
+        value="{{cloudEnv}}"
+        bindinput="onCloudEnvInput"
       />
     </view>
 
@@ -145,23 +256,6 @@
         <view class="prompt-reset" bindtap="onResetPrompt">重置为默认</view>
       </view>
     </view>
-
-    <!-- 订阅消息模板 ID -->
-    <view class="divider"></view>
-    <view class="config-row">
-      <view class="config-label">
-        <text class="label-main">订阅消息模板 ID</text>
-        <text class="label-hint">用于申请推送权限（需服务端定时下发）</text>
-      </view>
-      <input
-        class="config-input"
-        placeholder="如：ABC123..."
-        placeholder-class="input-ph"
-        value="{{tmplId}}"
-        bindinput="onTmplIdInput"
-      />
-    </view>
-    <view class="subscribe-btn" bindtap="onRequestSubscribe">申请消息推送权限</view>
   </view>
 
   <!-- 使用说明 -->

@@ -11,6 +11,7 @@ Page({
     aiMode: 'direct',
     cloudEnv: '',
     tmplId: '',
+    pushEnabled: false,
     showAdvanced: false,
     showSystemPrompt: false,
     testing: false,
@@ -43,6 +44,7 @@ Page({
       aiMode: settings.aiMode || 'direct',
       cloudEnv: settings.cloudEnv || '',
       tmplId: settings.tmplId || '',
+      pushEnabled: !!settings.pushEnabled,
       selectedPreset: settings.provider || '',
     });
   },
@@ -82,9 +84,64 @@ Page({
     this.setData({ tmplId: e.detail.value });
   },
 
+  // 服务通知推送开关
+  onPushEnabledChange(e) {
+    const val = e.currentTarget.dataset.val === 'true';
+    this.setData({ pushEnabled: val });
+    store.updateSettings({ pushEnabled: val });
+    wx.showToast({ title: val ? '已开启推送' : '已关闭推送', icon: 'none' });
+  },
+
+  // 立即同步待提醒任务到云端 + 顺带请求订阅授权（用户手势触发，微信才允许弹窗）
+  async onSyncNow() {
+    if (!this.data.cloudEnv) {
+      wx.showModal({
+        title: '未配置云环境 ID',
+        content: '服务通知推送需要云开发。请在高级配置中填写云环境 ID，并部署 syncReminders / pushReminders 两个云函数。',
+        showCancel: false,
+        confirmText: '知道了',
+      });
+      return;
+    }
+    // 先保存配置
+    store.updateSettings({
+      tmplId: this.data.tmplId.trim(),
+      pushEnabled: this.data.pushEnabled,
+      cloudEnv: this.data.cloudEnv.trim(),
+    });
+    wx.showLoading({ title: '同步中...' });
+    try {
+      const push = require('../../utils/push');
+      const res = await push.sync();
+      wx.hideLoading();
+      if (res && res.ok) {
+        wx.showToast({ title: `已同步 ${res.synced} 条提醒`, icon: 'success' });
+        // 同步成功 → 立即请求订阅授权（必须用户手势触发）
+        setTimeout(() => {
+          push.requestSubscribe().then((r) => {
+            if (r && r.ok) {
+              wx.showToast({ title: '已授权推送', icon: 'success' });
+            } else {
+              wx.showModal({
+                title: '授权失败',
+                content: (r && r.errMsg) || '未知错误，请重试',
+                showCancel: false,
+                confirmText: '知道了',
+              });
+            }
+          });
+        }, 600);
+      } else {
+        wx.showToast({ title: (res && res.error) || '同步失败', icon: 'none' });
+      }
+    } catch (err) {
+      wx.hideLoading();
+      wx.showToast({ title: err.message || '同步失败', icon: 'none' });
+    }
+  },
+
   // 申请订阅消息权限（需在小程序后台配置模板并部署服务端定时下发）
   async onRequestSubscribe() {
-    const ai = require('../../utils/ai');
     const reminder = require('../../utils/reminder');
     if (!this.data.tmplId) {
       wx.showModal({
@@ -159,6 +216,7 @@ Page({
       cloudEnv: this.data.cloudEnv.trim(),
       provider: this.data.selectedPreset,
       tmplId: this.data.tmplId.trim(),
+      pushEnabled: this.data.pushEnabled,
     });
 
     wx.showToast({ title: '已保存', icon: 'success' });
@@ -186,6 +244,7 @@ Page({
         apiKey: this.data.apiKey.trim(),
         model: this.data.model.trim(),
         aiMode: this.data.aiMode,
+        cloudEnv: this.data.cloudEnv.trim(),
       });
       this.setData({
         testing: false,
@@ -217,6 +276,8 @@ Page({
             aiMode: 'direct',
             cloudEnv: '',
             provider: '',
+            tmplId: '',
+            pushEnabled: false,
           });
           this.setData({
             apiBaseUrl: '',
@@ -227,6 +288,8 @@ Page({
             aiMode: 'direct',
             cloudEnv: '',
             selectedPreset: '',
+            tmplId: '',
+            pushEnabled: false,
             testResult: '',
             testStatus: '',
           });

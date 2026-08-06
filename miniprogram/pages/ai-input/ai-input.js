@@ -19,6 +19,9 @@ Page({
     // 解析结果
     showResult: false,
     parsedTask: null,
+    parsedTasks: [],
+    isMulti: false,
+    selectedTasks: {},
     recurrenceLabel: '',
 
     // 可编辑字段
@@ -78,7 +81,7 @@ Page({
   },
 
   onClearInput() {
-    this.setData({ inputText: '', showResult: false, parsedTask: null });
+    this.setData({ inputText: '', showResult: false, parsedTask: null, parsedTasks: [], isMulti: false, selectedTasks: {} });
   },
 
   // 使用示例
@@ -198,30 +201,78 @@ Page({
     }
   },
 
-  showParsedResult(parsed) {
-    const recurrenceLabel = recurring.describeRecurrence(parsed.recurrence);
-    let lunarLabel = '';
-
-    if (parsed.isBirthday && parsed.calendarType === 'lunar') {
-      lunarLabel = '农历';
+  showParsedResult(taskList) {
+    const list = Array.isArray(taskList) ? taskList : [taskList];
+    if (!list.length) {
+      wx.showToast({ title: '未解析到任务', icon: 'none' });
+      return;
     }
 
+    // 给每个任务附加展示用的标签
+    const enriched = list.map((t, i) => ({
+      ...t,
+      _idx: i,
+      recurrenceLabel: recurring.describeRecurrence(t.recurrence),
+      calendarLabel: t.calendarType === 'lunar' ? '农历' : '公历',
+      dateLabel: t.dueDate || '未设置',
+      priorityLabel: ['无', '低', '中', '高'][t.priority] || '无',
+    }));
+
+    // 单任务：走原有编辑流程
+    if (enriched.length === 1) {
+      const parsed = enriched[0];
+      this.setData({
+        showResult: true,
+        parsedTask: parsed,
+        parsedTasks: [],
+        isMulti: false,
+        selectedTasks: {},
+        recurrenceLabel: parsed.recurrenceLabel,
+        showLunarLabel: parsed.calendarType === 'lunar' ? '农历' : '',
+        editTitle: parsed.title || '',
+        editNote: parsed.note || '',
+        editPriority: parsed.priority || 0,
+        editDueDate: parsed.dueDate || '',
+        editDueTime: parsed.dueTime || '',
+        editCategory: parsed.category || 'inbox',
+        editRecurrence: parsed.recurrence || { type: 'none', interval: 1 },
+        editIsBirthday: parsed.isBirthday || false,
+        editBirthdayName: parsed.birthdayName || '',
+        editCalendarType: parsed.calendarType || 'solar',
+      });
+      return;
+    }
+
+    // 多任务：列表勾选 + 批量创建
+    const selected = {};
+    enriched.forEach((_, i) => {
+      selected[i] = true;
+    });
     this.setData({
       showResult: true,
-      parsedTask: parsed,
-      recurrenceLabel,
-      showLunarLabel: lunarLabel,
-      editTitle: parsed.title || '',
-      editNote: parsed.note || '',
-      editPriority: parsed.priority || 0,
-      editDueDate: parsed.dueDate || '',
-      editDueTime: parsed.dueTime || '',
-      editCategory: parsed.category || 'inbox',
-      editRecurrence: parsed.recurrence || { type: 'none', interval: 1 },
-      editIsBirthday: parsed.isBirthday || false,
-      editBirthdayName: parsed.birthdayName || '',
-      editCalendarType: parsed.calendarType || 'solar',
+      parsedTask: null,
+      parsedTasks: enriched,
+      isMulti: true,
+      selectedTasks: selected,
     });
+  },
+
+  // 多任务：勾选/取消单个
+  onToggleTaskSelect(e) {
+    const idx = e.currentTarget.dataset.idx;
+    const sel = Object.assign({}, this.data.selectedTasks);
+    sel[idx] = !sel[idx];
+    this.setData({ selectedTasks: sel });
+  },
+
+  // 多任务：全选/取消全选
+  onToggleSelectAll() {
+    const sel = {};
+    const anyOff = this.data.parsedTasks.some((_, i) => !this.data.selectedTasks[i]);
+    this.data.parsedTasks.forEach((_, i) => {
+      sel[i] = anyOff;
+    });
+    this.setData({ selectedTasks: sel });
   },
 
   // 编辑解析结果
@@ -279,11 +330,45 @@ Page({
 
   // 确认创建任务
   onConfirmCreate() {
+    // 多任务：批量创建选中项
+    if (this.data.isMulti) {
+      const selected = this.data.parsedTasks.filter((_, i) => this.data.selectedTasks[i]);
+      if (!selected.length) {
+        wx.showToast({ title: '请至少选择一个任务', icon: 'none' });
+        return;
+      }
+      selected.forEach((t) => {
+        store.addTask({
+          title: (t.title || '').trim() || '新任务',
+          note: t.note || '',
+          priority: t.priority || 0,
+          dueDate: t.dueDate || '',
+          dueTime: t.dueTime || '',
+          category: t.category || 'inbox',
+          recurrence: t.recurrence || { type: 'none', interval: 1 },
+          isBirthday: !!t.isBirthday,
+          birthdayName: t.birthdayName || '',
+          calendarType: t.calendarType || 'solar',
+          birthdayLunarMonth: t.birthdayLunarMonth || 0,
+          birthdayLunarDay: t.birthdayLunarDay || 0,
+          birthdayLunarIsLeap: !!t.birthdayLunarIsLeap,
+          reminderOffset: t.reminderOffset !== undefined ? t.reminderOffset : null,
+        });
+      });
+      wx.showToast({ title: '已创建 ' + selected.length + ' 个任务', icon: 'success' });
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1000);
+      return;
+    }
+
+    // 单任务：走编辑后创建
     if (!this.data.editTitle.trim()) {
       wx.showToast({ title: '请输入任务标题', icon: 'none' });
       return;
     }
 
+    const t = this.data.parsedTask || {};
     const taskData = {
       title: this.data.editTitle.trim(),
       note: this.data.editNote.trim(),
@@ -295,15 +380,23 @@ Page({
       isBirthday: this.data.editIsBirthday,
       birthdayName: this.data.editBirthdayName,
       calendarType: this.data.editCalendarType,
+      reminderOffset: t.reminderOffset !== undefined ? t.reminderOffset : null,
     };
 
     // 如果是农历生日，保存农历原始数据
     if (this.data.editIsBirthday && this.data.editCalendarType === 'lunar' && this.data.editDueDate) {
-      const lunarInfo = lunar.solarStrToLunar(this.data.editDueDate);
-      if (lunarInfo) {
-        taskData.birthdayLunarMonth = lunarInfo.month;
-        taskData.birthdayLunarDay = lunarInfo.day;
-        taskData.birthdayLunarIsLeap = lunarInfo.isLeap;
+      // 优先用 AI 解析出的农历原始值，否则由公历 dueDate 反推
+      if (t.birthdayLunarMonth && t.birthdayLunarDay) {
+        taskData.birthdayLunarMonth = t.birthdayLunarMonth;
+        taskData.birthdayLunarDay = t.birthdayLunarDay;
+        taskData.birthdayLunarIsLeap = t.birthdayLunarIsLeap;
+      } else {
+        const lunarInfo = lunar.solarStrToLunar(this.data.editDueDate);
+        if (lunarInfo) {
+          taskData.birthdayLunarMonth = lunarInfo.month;
+          taskData.birthdayLunarDay = lunarInfo.day;
+          taskData.birthdayLunarIsLeap = lunarInfo.isLeap;
+        }
       }
     }
 
@@ -319,6 +412,9 @@ Page({
     this.setData({
       showResult: false,
       parsedTask: null,
+      parsedTasks: [],
+      isMulti: false,
+      selectedTasks: {},
       inputText: '',
     });
   },

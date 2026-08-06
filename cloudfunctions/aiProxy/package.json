@@ -1,0 +1,8 @@
+{
+  "name": "aiProxy",
+  "version": "1.0.0",
+  "description": "微信云开发云函数：转发 OpenAI 兼容的大模型请求，使小程序免配服务器域名",
+  "main": "index.js",
+  "dependencies": {},
+  "license": "MIT"
+}

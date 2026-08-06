@@ -1,8 +1,9 @@
 {
   "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "projectname": "todo-miniprogram",
   "description": "Todo list mini program inspired by TickTick",
-  "appid": "wx24d3cb1312f4410a",
+  "appid": "wx3c67644aa784eda2",
   "setting": {
     "urlCheck": true,
     "es6": true,
@@ -47,7 +48,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.3.4",
+  "libVersion": "3.17.1",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",

@@ -58,15 +58,20 @@ const normalize = (recurrence) => {
 
 /**
  * 计算某个季度起始月（1/4/7/10 月 1 日）对应的具体到期日
+ * @param {Date} qStart          季度起始日期（该季度首月 1 日）
+ * @param {string} mode          模式：'date' 按日期 | 'week' 按第几周
+ * @param {number} weekOfQuarter 季度第几周（1-13）
+ * @param {number|null} dayOfWeek 星期几（0=周日）
+ * @param {number} dayOfMonth    月份第几天
  */
-const computeQuarterOccurrence = (qStart, baseDate) => {
+const computeQuarterOccurrence = (qStart, { mode, weekOfQuarter, dayOfWeek, dayOfMonth }) => {
   const year = qStart.getFullYear();
   const month = qStart.getMonth();
 
-  if (r_mode === 'week') {
+  if (mode === 'week') {
     // 季度第 N 周：weekStart = 季度第1天 + (N-1)*7 天，再取该周指定星期几
-    const weekStart = new Date(year, month, 1 + (r_weekOfQuarter - 1) * 7);
-    const dow = r_dayOfWeek !== null && r_dayOfWeek !== undefined ? r_dayOfWeek : weekStart.getDay();
+    const weekStart = new Date(year, month, 1 + (weekOfQuarter - 1) * 7);
+    const dow = dayOfWeek !== null && dayOfWeek !== undefined ? dayOfWeek : weekStart.getDay();
     const diff = (dow - weekStart.getDay() + 7) % 7;
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + diff);
@@ -74,16 +79,10 @@ const computeQuarterOccurrence = (qStart, baseDate) => {
   }
 
   // 默认按日期：季度首月第 dayOfMonth 号
-  const day = r_dayOfMonth || qStart.getDate();
+  const day = dayOfMonth || qStart.getDate();
   const maxDay = daysInMonth(year, month);
   return new Date(year, month, Math.min(day, maxDay));
 };
-
-// 当前季度规则上下文（在 computeNextOccurrence 中填充，供 computeQuarterOccurrence 使用）
-let r_mode = 'date';
-let r_weekOfQuarter = 1;
-let r_dayOfWeek = null;
-let r_dayOfMonth = 1;
 
 /**
  * 计算下一次到期日期（严格晚于 fromDate）
@@ -131,10 +130,12 @@ const computeNextOccurrence = (recurrence, fromDateString) => {
     }
 
     case 'quarterly': {
-      r_mode = rec.mode;
-      r_weekOfQuarter = rec.weekOfQuarter || 1;
-      r_dayOfWeek = rec.dayOfWeek;
-      r_dayOfMonth = rec.dayOfMonth || 1;
+      const qParams = {
+        mode: rec.mode || 'date',
+        weekOfQuarter: rec.weekOfQuarter || 1,
+        dayOfWeek: rec.dayOfWeek,
+        dayOfMonth: rec.dayOfMonth || 1,
+      };
 
       let baseYear = fromDate.getFullYear();
       let baseMonth = Math.floor(fromDate.getMonth() / 3) * 3; // 0,3,6,9
@@ -143,7 +144,7 @@ const computeNextOccurrence = (recurrence, fromDateString) => {
       // 最多向前推算 8 个季度，找到第一个晚于 fromDate 的日期
       for (let i = 0; i < 8; i++) {
         const qStart = new Date(baseYear, baseMonth, 1);
-        const occ = computeQuarterOccurrence(qStart);
+        const occ = computeQuarterOccurrence(qStart, qParams);
         if (occ > fromDate) {
           candidate = occ;
           break;

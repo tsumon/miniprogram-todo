@@ -502,3 +502,95 @@
 .btn-create:active {
   background: #3a7bc8;
 }
+
+/* ===== 多任务列表 ===== */
+.multi-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 24rpx 16rpx;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  color: #4a90d9;
+}
+
+.task-list {
+  padding: 0 24rpx;
+}
+
+.task-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.tci-check {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 4rpx solid #ddd;
+  margin-top: 4rpx;
+  background: #fff;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tci-check.on {
+  border-color: #4a90d9;
+  background: #4a90d9;
+}
+
+.tci-check.on::after {
+  content: '';
+  position: absolute;
+  left: 10rpx;
+  top: 6rpx;
+  width: 12rpx;
+  height: 20rpx;
+  border: solid #fff;
+  border-width: 0 4rpx 4rpx 0;
+  transform: rotate(45deg);
+}
+
+.tci-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tci-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 12rpx;
+  word-break: break-all;
+}
+
+.tci-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tci-tag {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  background: #f2f3f5;
+  color: #666;
+  white-space: nowrap;
+}
+
+.tci-birthday {
+  background: #fff0f0;
+  color: #e24b4a;
+}
+
+.tci-pri-1 { background: #eaf3fc; color: #4a90d9; }
+.tci-pri-2 { background: #fff5e6; color: #ef9f27; }
+.tci-pri-3 { background: #ffeaea; color: #e24b4a; }

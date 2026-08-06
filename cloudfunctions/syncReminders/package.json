@@ -1,0 +1,10 @@
+{
+  "name": "syncReminders",
+  "version": "1.0.0",
+  "description": "前端同步待提醒任务到云数据库，供 pushReminders 定时推送",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "license": "MIT"
+}

@@ -184,20 +184,26 @@ const toggleTask = (id) => {
         dueDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       }
 
-      const now = new Date().toISOString();
-      tasks.push({
-        ...tasks[index],
-        id: 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-        dueDate: dueDate,
-        completed: false,
-        completedAt: null,
-        createdAt: now,
-        updatedAt: now,
-        parentId: tasks[index].id,
-        // 保存实际的生日日期用于显示
-        actualBirthday: nextBirthday,
-        snoozeUntil: null,
-      });
+      // 去重：避免与周期块重复创建同 parentId + 同 dueDate 的任务
+      const exists = tasks.some(
+        (t) => t.parentId === tasks[index].id && t.dueDate === dueDate
+      );
+      if (!exists) {
+        const now = new Date().toISOString();
+        tasks.push({
+          ...tasks[index],
+          id: 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+          dueDate: dueDate,
+          completed: false,
+          completedAt: null,
+          createdAt: now,
+          updatedAt: now,
+          parentId: tasks[index].id,
+          // 保存实际的生日日期用于显示
+          actualBirthday: nextBirthday,
+          snoozeUntil: null,
+        });
+      }
     }
   }
 
@@ -211,8 +217,58 @@ const getTaskById = (id) => {
 };
 
 /**
- * 检查并生成逾期的周期任务
- * 应在 app onShow 时调用
+ * 检查并生成逾期的农历生日任务（太阳能用 yearly 周期自动处理，农历需单独计算）
+ */
+const checkBirthdayTasks = () => {
+  const tasks = wx.getStorageSync(TASKS_KEY) || [];
+  const lunarMod = require('./lunar');
+  const today = new Date().toISOString().split('T')[0];
+  const newTasks = [];
+
+  tasks.forEach((task) => {
+    if (!task.isBirthday || task.completed) return;
+    if (task.calendarType !== 'lunar') return;
+    if (!task.dueDate || task.dueDate >= today) return;
+    if (!task.birthdayLunarMonth || !task.birthdayLunarDay) return;
+
+    const nextSolar = lunarMod.getNextLunarBirthday(
+      task.birthdayLunarMonth,
+      task.birthdayLunarDay,
+      task.birthdayLunarIsLeap,
+      new Date()
+    );
+    if (!nextSolar) return;
+
+    const exists =
+      tasks.some((t) => t.parentId === task.id && t.dueDate === nextSolar) ||
+      newTasks.some((t) => t.parentId === task.id && t.dueDate === nextSolar);
+    if (exists) return;
+
+    const now = new Date().toISOString();
+    newTasks.push({
+      ...task,
+      id: 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      dueDate: nextSolar,
+      completed: false,
+      completedAt: null,
+      createdAt: now,
+      updatedAt: now,
+      parentId: task.id,
+      snoozeUntil: null,
+    });
+  });
+
+  if (newTasks.length > 0) {
+    const allTasks = [...tasks, ...newTasks];
+    wx.setStorageSync(TASKS_KEY, allTasks);
+  }
+
+  return newTasks.length;
+};
+
+/**
+ * 检查并生成逾期的周期任务 + 农历生日任务
+ * 应在 app onShow / 日历 loadData 时调用
  */
 const checkRecurringTasks = () => {
   const tasks = wx.getStorageSync(TASKS_KEY) || [];
@@ -224,7 +280,10 @@ const checkRecurringTasks = () => {
     wx.setStorageSync(TASKS_KEY, allTasks);
   }
 
-  return newTasks.length;
+  // 同时检查农历生日
+  const birthdayCount = checkBirthdayTasks();
+
+  return newTasks.length + birthdayCount;
 };
 
 /* ==================== Categories ==================== */
@@ -320,6 +379,9 @@ const getSettings = () => {
       systemPrompt: '',
       aiMode: 'direct', // 'direct' 直连 | 'cloud' 云函数转发
       cloudEnv: '', // 云开发环境 ID（aiMode==='cloud' 时需要）
+      // 服务通知推送
+      pushEnabled: false, // 是否启用微信服务通知推送
+      tmplId: '', // 订阅消息模板 ID
     }
   );
 };

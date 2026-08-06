@@ -33,6 +33,9 @@ Page({
   },
 
   loadData() {
+    // 先生成逾期的周期任务和农历生日任务的下一期实例
+    store.checkRecurringTasks();
+
     const { year, month, selectedDate, today } = this.data;
     const tasks = store.getTasks({});
 

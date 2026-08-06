@@ -33,7 +33,7 @@ const PROVIDER_PRESETS = [
   { id: 'custom', name: '自定义', desc: '自定义端点', baseUrl: '', model: '' },
 ];
 
-const DEFAULT_SYSTEM_PROMPT = `你是一个智能任务解析助手。用户会用自然语言描述一个待办事项或提醒，请将其解析为结构化的JSON格式。
+const DEFAULT_SYSTEM_PROMPT = `你是一个智能任务解析助手。用户会用自然语言描述一个或多个待办事项或提醒，请将其解析为结构化的JSON格式。当用户一次描述多个事项（例如多人生日）时，必须把每一项都解析出来，放入 tasks 数组。
 
 当前日期信息：
 - 今天日期: {{TODAY}}
@@ -41,25 +41,32 @@ const DEFAULT_SYSTEM_PROMPT = `你是一个智能任务解析助手。用户会�
 
 请返回以下JSON格式（仅返回JSON，不要包含任何其他文字或解释）：
 {
-  "title": "任务标题（简洁明了，不超过20字）",
-  "note": "备注说明，没有则为空字符串",
-  "priority": 0,
-  "dueDate": "YYYY-MM-DD",
-  "dueTime": "HH:MM 或空字符串",
-  "category": "inbox",
-  "recurrence": {
-    "type": "none",
-    "interval": 1,
-    "mode": "date",
-    "dayOfWeek": null,
-    "dayOfMonth": null,
-    "monthOfYear": null,
-    "weekOfQuarter": null
-  },
-  "isBirthday": false,
-  "birthdayName": "",
-  "calendarType": "solar",
-  "reminderOffset": null
+  "tasks": [
+    {
+      "title": "任务标题（简洁明了，不超过20字）",
+      "note": "备注说明，没有则为空字符串",
+      "priority": 0,
+      "dueDate": "YYYY-MM-DD",
+      "dueTime": "HH:MM 或空字符串",
+      "category": "inbox",
+      "recurrence": {
+        "type": "none",
+        "interval": 1,
+        "mode": "date",
+        "dayOfWeek": null,
+        "dayOfMonth": null,
+        "monthOfYear": null,
+        "weekOfQuarter": null
+      },
+      "isBirthday": false,
+      "birthdayName": "",
+      "calendarType": "solar",
+      "birthdayLunarMonth": 0,
+      "birthdayLunarDay": 0,
+      "birthdayLunarIsLeap": false,
+      "reminderOffset": null
+    }
+  ]
 }
 
 字段说明：
@@ -79,12 +86,16 @@ const DEFAULT_SYSTEM_PROMPT = `你是一个智能任务解析助手。用户会�
    - "每半年"=type:"monthly",interval:6
    - "每年X月X日"=type:"yearly",interval:1,monthOfYear:X,dayOfMonth:X
    - "每两年"=type:"yearly",interval:2
+   - 生日：recurrence 固定填 type:"none"（生日跨年由系统自动处理，无需重复规则）
    - 无周期表述则type:"none"
 7. isBirthday: 用户提到"生日"或"XX的生日"时设为true，birthdayName为生日主人名字
 8. calendarType: 用户提到"农历"或"阴历"时设为"lunar"，否则为"solar"
-9. reminderOffset: 提醒提前量（分钟）。"提前1小时"=60，"提前15分钟"=15，"提前1天"=1440，"准时"=0，未提及则为 null
-10. 如果有周期但没有明确日期，dueDate设为从今天开始计算的首次到期日
-11. 如果是生日提醒，dueDate设为今年的生日日期（如果今年已过则设为明年）`;
+9. birthdayLunarMonth / birthdayLunarDay / birthdayLunarIsLeap: 仅当 calendarType 为 "lunar" 的生日时填写。农历月(1-12)、农历日(1-30)、是否闰月。例如"农历八月初十"→birthdayLunarMonth:8, birthdayLunarDay:10, birthdayLunarIsLeap:false；"农历闰六月初一"→6,1,true。公历生日或不涉及农历时填 0,0,false。
+10. reminderOffset: 提醒提前量（分钟）。"提前1小时"=60，"提前15分钟"=15，"提前1天"=1440，"准时"=0，未提及则为 null
+11. 如果有周期但没有明确日期，dueDate设为从今天开始计算的首次到期日
+12. 如果是公历生日提醒，dueDate设为今年的生日日期（如果今年已过则设为明年）
+13. 如果是农历生日提醒，dueDate 填写今年对应的公历日期（如果今年已过则填明年）；同时必须填写 birthdayLunarMonth/birthdayLunarDay/birthdayLunarIsLeap 原始农历值
+14. 多任务：用户一次描述多个事项时，tasks 数组放多个完整对象。例如"张三生日5月1日，李四生日农历八月初八"→两个任务对象，张三 isBirthday:true calendarType:"solar" dueDate:"今年5月1日"，李四 isBirthday:true calendarType:"lunar" birthdayLunarMonth:8 birthdayLunarDay:8 dueDate:"今年农历八月初八对应的公历日期"`;
 
 /**
  * 将 Date 格式化为 YYYY-MM-DD
@@ -235,7 +246,7 @@ const callChatCompletions = (payload) => {
  * 调用 AI API 解析自然语言为结构化任务
  * @param {string} text 用户输入的文本
  * @param {Object} settings API配置（apiBaseUrl, apiKey, model, systemPrompt, aiMode）
- * @returns {Promise<Object>} 解析后的任务对象
+ * @returns {Promise<Array<Object>>} 解析后的任务对象数组（始终返回数组，单个任务也是长度1的数组）
  */
 const parseTask = (text, settings) => {
   const s = settings || {};
@@ -273,7 +284,18 @@ const parseTask = (text, settings) => {
     } catch (e) {
       throw new Error('解析 AI 返回失败: ' + e.message + ' 原始内容: ' + content.substring(0, 200));
     }
-    return normalizeParsedTask(parsed);
+    // 兼容三种返回形态：{tasks:[...]} / 单对象 / 数组
+    let taskList;
+    if (Array.isArray(parsed)) {
+      taskList = parsed;
+    } else if (parsed && Array.isArray(parsed.tasks)) {
+      taskList = parsed.tasks;
+    } else if (parsed && typeof parsed === 'object') {
+      taskList = [parsed];
+    } else {
+      taskList = [];
+    }
+    return taskList.map(normalizeParsedTask);
   });
 };
 
@@ -281,6 +303,8 @@ const parseTask = (text, settings) => {
  * 规范化解析后的任务对象，补充默认值
  */
 const normalizeParsedTask = (parsed) => {
+  if (!parsed || typeof parsed !== 'object') parsed = {};
+
   // 确保 recurrence 存在
   if (!parsed.recurrence) {
     parsed.recurrence = { type: 'none', interval: 1 };
@@ -304,23 +328,57 @@ const normalizeParsedTask = (parsed) => {
   parsed.isBirthday = !!parsed.isBirthday;
   parsed.calendarType = parsed.calendarType === 'lunar' ? 'lunar' : 'solar';
 
-  // 提醒提前量
+  // 提醒提前量（生日任务默认到期时提醒，普通任务默认不提醒）
   if (parsed.reminderOffset === undefined || parsed.reminderOffset === null) {
-    parsed.reminderOffset = null;
+    parsed.reminderOffset = parsed.isBirthday ? 0 : null;
   } else {
     const v = parseInt(parsed.reminderOffset);
-    parsed.reminderOffset = isNaN(v) ? null : v;
+    parsed.reminderOffset = isNaN(v) ? (parsed.isBirthday ? 0 : null) : v;
   }
 
-  // 如果是农历生日，将农历日期转换为公历 dueDate
-  if (parsed.isBirthday && parsed.calendarType === 'lunar' && parsed.birthdayLunarMonth) {
-    const solar = lunar.getNextLunarBirthday(
-      parseInt(parsed.birthdayLunarMonth),
-      parseInt(parsed.birthdayLunarMonth) === parseInt(parsed.birthdayLunarMonth) ? parseInt(parsed.birthdayLunarDay) : 1,
-      false,
-      new Date()
-    );
-    if (solar) parsed.dueDate = solar;
+  // 生日：公历生日自动设置 yearly 周期，每年自动提醒
+  // 农历生日保持 none（跨年由 checkBirthdayTasks 根据农历月日单独计算）
+  if (parsed.isBirthday) {
+    if (parsed.calendarType === 'solar' && parsed.dueDate) {
+      const parts = parsed.dueDate.split('-').map(Number);
+      if (parts.length === 3 && parts[1] && parts[2]) {
+        parsed.recurrence = {
+          type: 'yearly',
+          interval: 1,
+          monthOfYear: parts[1],
+          dayOfMonth: parts[2],
+        };
+      }
+    } else {
+      // 农历生日或无法确定公历日期时保持 none
+      parsed.recurrence = { type: 'none', interval: 1 };
+    }
+  }
+
+  // 农历生日处理：优先用 AI 给的农历月日计算公历 dueDate；若 AI 只给了公历 dueDate 则反推农历
+  if (parsed.isBirthday && parsed.calendarType === 'lunar') {
+    const lm = parseInt(parsed.birthdayLunarMonth);
+    const ld = parseInt(parsed.birthdayLunarDay);
+    if (lm > 0 && ld > 0) {
+      parsed.birthdayLunarMonth = lm;
+      parsed.birthdayLunarDay = ld;
+      parsed.birthdayLunarIsLeap = !!parsed.birthdayLunarIsLeap;
+      // 用农历月日计算今年（或明年）的公历 dueDate
+      const solar = lunar.getNextLunarBirthday(lm, ld, parsed.birthdayLunarIsLeap, new Date());
+      if (solar) parsed.dueDate = solar;
+    } else if (parsed.dueDate) {
+      // AI 已算出公历 dueDate，反推农历原始值保存
+      const info = lunar.solarStrToLunar(parsed.dueDate);
+      if (info) {
+        parsed.birthdayLunarMonth = info.month;
+        parsed.birthdayLunarDay = info.day;
+        parsed.birthdayLunarIsLeap = info.isLeap;
+      }
+    }
+  } else {
+    parsed.birthdayLunarMonth = parseInt(parsed.birthdayLunarMonth) || 0;
+    parsed.birthdayLunarDay = parseInt(parsed.birthdayLunarDay) || 0;
+    parsed.birthdayLunarIsLeap = !!parsed.birthdayLunarIsLeap;
   }
 
   // 确保 category 有默认值
@@ -328,6 +386,9 @@ const normalizeParsedTask = (parsed) => {
 
   // 确保 note 有默认值
   if (!parsed.note) parsed.note = '';
+
+  // 确保 birthdayName 有默认值
+  if (!parsed.birthdayName) parsed.birthdayName = '';
 
   return parsed;
 };
@@ -343,17 +404,30 @@ const testConnection = (settings) => {
   const model = s.model || 'gpt-4o-mini';
   const apiKey = s.apiKey || '';
   const mode = s.aiMode || getAIMode();
+  const cloudEnv = s.cloudEnv || '';
 
   return new Promise((resolve, reject) => {
     if (mode === 'cloud') {
-      if (typeof wx.cloud === 'undefined' || !wx.cloud) {
-        reject(new Error('未初始化云开发：请在开发者工具中开通云开发，并在设置中填写云环境 ID'));
+      if (typeof wx.cloud === 'undefined') {
+        reject(new Error('当前环境不支持云开发'));
+        return;
+      }
+      if (!cloudEnv) {
+        reject(new Error('请先在设置中填写云环境 ID'));
         return;
       }
       if (!baseUrl || !apiKey) {
         reject(new Error('请先填写 API 地址和密钥'));
         return;
       }
+
+      // 确保云开发已用正确的环境 ID 初始化（用户可能刚改了 cloudEnv 还没保存重启）
+      try {
+        wx.cloud.init({ env: cloudEnv, traceUser: false });
+      } catch (e) {
+        // init 重复调用会抛异常，可忽略
+      }
+
       wx.cloud.callFunction({
         name: CLOUD_FN_NAME,
         data: {

@@ -73,8 +73,48 @@
     </view>
   </view>
 
-  <!-- 解析结果 -->
-  <view class="result-section" wx:if="{{showResult}}">
+  <!-- 解析结果：多任务列表 -->
+  <view class="result-section" wx:if="{{showResult && isMulti}}">
+    <view class="result-header">
+      <view class="result-badge">AI 已解析 {{parsedTasks.length}} 个任务</view>
+      <text class="result-hint">勾选后批量创建</text>
+    </view>
+
+    <view class="multi-toolbar" bindtap="onToggleSelectAll">
+      <text>全选/取消</text>
+    </view>
+
+    <view class="task-list">
+      <view
+        class="task-check-item card"
+        wx:for="{{parsedTasks}}"
+        wx:key="_idx"
+        data-idx="{{index}}"
+        bindtap="onToggleTaskSelect"
+      >
+        <view class="tci-check {{selectedTasks[index] ? 'on' : ''}}"></view>
+        <view class="tci-body">
+          <view class="tci-title">{{item.title}}</view>
+          <view class="tci-meta">
+            <text wx:if="{{item.isBirthday}}" class="tci-tag tci-birthday">🎂 {{item.birthdayName || '生日'}}</text>
+            <text class="tci-tag">{{item.calendarLabel}}</text>
+            <text class="tci-tag">📅 {{item.dateLabel}}</text>
+            <text wx:if="{{item.recurrenceLabel !== '不重复'}}" class="tci-tag">🔄 {{item.recurrenceLabel}}</text>
+            <text wx:if="{{item.priority > 0}}" class="tci-tag tci-pri-{{item.priority}}">{{item.priorityLabel}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="result-actions">
+      <view class="btn-discard" bindtap="onDiscard">放弃</view>
+      <view class="btn-create" bindtap="onConfirmCreate">创建选中任务</view>
+    </view>
+  </view>
+
+  <!-- 解析结果：单任务编辑 -->
+  <view class="result-section" wx:if="{{showResult && !isMulti}}">
     <view class="result-header">
       <view class="result-badge">AI 已解析</view>
       <text class="result-hint">请确认信息无误后创建</text>

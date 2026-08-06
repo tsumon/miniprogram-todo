@@ -1,0 +1,10 @@
+{
+  "name": "pushReminders",
+  "version": "1.0.0",
+  "description": "定时扫描 reminders 集合并通过订阅消息推送微信服务通知",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "license": "MIT"
+}
