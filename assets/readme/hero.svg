@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">Todo 清单</title>
+  <desc id="desc">微信小程序待办，参考嘀嗒清单。任务存在本地，打开即用。右侧是首页「今天」：勾选圆、四级优先级点、分类标签、农历生日徽章，以及文字-only 的「今天 / 全部 / 日历 / 我的」tabBar。</desc>
+
+  <defs>
+    <clipPath id="hero-clip">
+      <rect width="1200" height="420" rx="26"/>
+    </clipPath>
+    <linearGradient id="progress-fill" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4A90D9"/>
+      <stop offset="1" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="ai-fab" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6A5ACD"/>
+      <stop offset="1" stop-color="#4A90D9"/>
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#hero-clip)">
+    <rect width="1200" height="420" fill="#F3F5F8"/>
+
+    <!-- Motif: one oversized hollow check-circle, not a wallpaper grid -->
+    <circle cx="168" cy="248" r="132" fill="none" stroke="#4A90D9" stroke-width="22" opacity="0.09"/>
+    <circle cx="168" cy="248" r="92" fill="none" stroke="#1D9E75" stroke-width="10" opacity="0.08"/>
+
+    <!-- Title block -->
+    <g transform="translate(56 44)">
+      <g id="motif-checks">
+        <circle cx="12" cy="12" r="12" fill="#1D9E75"/>
+        <path d="M6 12.5l4 4 8.5-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="44" cy="12" r="5" fill="#CCCCCC"/>
+        <circle cx="64" cy="12" r="5" fill="#4A90D9"/>
+        <circle cx="84" cy="12" r="5" fill="#EF9F27"/>
+        <circle cx="104" cy="12" r="5" fill="#E24B4A"/>
+      </g>
+
+      <text x="0" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" font-weight="600" fill="#185FA5">微信小程序</text>
+
+      <text x="0" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="52" font-weight="700" fill="#2C2C2A">Todo 清单</text>
+
+      <text x="0" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="21" font-weight="600" fill="#2C2C2A">参考嘀嗒清单的待办。任务存在本地，</text>
+      <text x="0" y="188" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="21" font-weight="600" fill="#2C2C2A">打开就能用。</text>
+      <text x="0" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="20" fill="#888888">说话或打字，AI 拆成标题、日期、优先级；</text>
+      <text x="0" y="252" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="20" fill="#888888">农历生日会换成公历，到期打开小程序才弹窗。</text>
+
+      <!-- Real tabBar labels as pills -->
+      <g transform="translate(0 278)">
+        <rect width="72" height="34" rx="17" fill="#4A90D9"/>
+        <text x="36" y="23" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" font-weight="600" fill="#fff">今天</text>
+        <rect x="80" width="72" height="34" rx="17" fill="#fff" stroke="#ECECEC"/>
+        <text x="116" y="23" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" font-weight="600" fill="#888888">全部</text>
+        <rect x="160" width="72" height="34" rx="17" fill="#fff" stroke="#ECECEC"/>
+        <text x="196" y="23" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" font-weight="600" fill="#888888">日历</text>
+        <rect x="240" width="72" height="34" rx="17" fill="#fff" stroke="#ECECEC"/>
+        <text x="276" y="23" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" font-weight="600" fill="#888888">我的</text>
+      </g>
+
+      <text x="0" y="348" font-family="ui-monospace, SFMono-Regular, Menlo, 'Noto Sans Mono CJK SC', monospace" font-size="16" fill="#B4B2A9">WXML / WXSS / JS  ·  零 npm  ·  wx.setStorageSync</text>
+    </g>
+
+    <!-- Mini-program today screen -->
+    <g id="project-proof" transform="translate(628 32)">
+      <rect x="10" y="10" width="516" height="356" rx="24" fill="#D8DCE3" opacity="0.45"/>
+      <rect width="516" height="356" rx="24" fill="#FFFFFF"/>
+      <rect width="516" height="356" rx="24" fill="none" stroke="#E4E7EC"/>
+
+      <!-- WeChat mini-program chrome -->
+      <text x="22" y="32" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="16" font-weight="600" fill="#2C2C2A">09:41</text>
+      <g transform="translate(394 14)">
+        <rect width="100" height="28" rx="14" fill="#F3F3F3" stroke="#E0E0E0"/>
+        <circle cx="22" cy="14" r="2.2" fill="#3A3A3A"/>
+        <circle cx="32" cy="14" r="2.2" fill="#3A3A3A"/>
+        <circle cx="42" cy="14" r="2.2" fill="#3A3A3A"/>
+        <path d="M58 8 v12" stroke="#D0D0D0" stroke-width="1"/>
+        <circle cx="78" cy="14" r="7" fill="none" stroke="#3A3A3A" stroke-width="1.6"/>
+      </g>
+
+      <text x="22" y="62" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="26" font-weight="700" fill="#2C2C2A">早上好</text>
+      <text x="22" y="84" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">9月4日 星期五</text>
+
+      <g transform="translate(22 96)">
+        <text x="40" y="22" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="22" font-weight="700" fill="#2C2C2A">2</text>
+        <text x="40" y="42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#999999">待完成</text>
+        <rect x="86" y="10" width="1" height="28" fill="#EEEEEE"/>
+        <text x="140" y="22" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="22" font-weight="700" fill="#1D9E75">1</text>
+        <text x="140" y="42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#999999">已完成</text>
+        <rect x="186" y="10" width="1" height="28" fill="#EEEEEE"/>
+        <text x="236" y="22" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="22" font-weight="700" fill="#2C2C2A">0</text>
+        <text x="236" y="42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#999999">逾期</text>
+      </g>
+
+      <rect x="22" y="150" width="340" height="6" rx="3" fill="#F0F0F0"/>
+      <rect x="22" y="150" width="113" height="6" rx="3" fill="url(#progress-fill)"/>
+      <text x="374" y="157" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">1/3</text>
+
+      <text x="22" y="186" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" font-weight="600" fill="#2C2C2A">今天</text>
+      <rect x="66" y="170" width="28" height="20" rx="10" fill="#F0F0F0"/>
+      <text x="80" y="185" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13" fill="#888888">3</text>
+
+      <!-- Task list card -->
+      <g transform="translate(16 198)">
+        <rect width="484" height="108" rx="12" fill="#FFFFFF" stroke="#F0F0F0"/>
+
+        <g transform="translate(14 8)" opacity="0.55">
+          <circle cx="12" cy="16" r="10" fill="#1D9E75"/>
+          <path d="M7 16.4l3.6 3.6 7.4-7.6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="34" cy="16" r="3.4" fill="#EF9F27"/>
+          <text x="48" y="22" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" fill="#888888" text-decoration="line-through">欢迎使用 Todo 清单</text>
+        </g>
+        <path d="M12 40 H472" stroke="#F0F0F0" stroke-width="1"/>
+
+        <g transform="translate(14 46)">
+          <circle cx="12" cy="16" r="10" fill="none" stroke="#D0D0D0" stroke-width="2"/>
+          <circle cx="34" cy="16" r="3.4" fill="#4A90D9"/>
+          <text x="48" y="22" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" fill="#2C2C2A">试试创建一个新任务</text>
+          <rect x="236" y="6" width="44" height="20" rx="4" fill="none" stroke="#4A90D9"/>
+          <text x="258" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="13" fill="#4A90D9">个人</text>
+        </g>
+        <path d="M12 74 H472" stroke="#F0F0F0" stroke-width="1"/>
+
+        <g transform="translate(14 80)">
+          <circle cx="12" cy="16" r="10" fill="none" stroke="#D0D0D0" stroke-width="2"/>
+          <circle cx="34" cy="16" r="3.4" fill="#E24B4A"/>
+          <text x="48" y="22" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" fill="#2C2C2A">妈妈的生日</text>
+          <rect x="160" y="6" width="40" height="20" rx="4" fill="#FFF3E0"/>
+          <text x="180" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="13" font-weight="600" fill="#E65100">生日</text>
+          <text x="208" y="22" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">农历八月初十</text>
+        </g>
+      </g>
+
+      <!-- Text-only tabBar (the app has no tab icons) -->
+      <rect y="314" width="516" height="42" fill="#FFFFFF"/>
+      <path d="M0 314 H516" stroke="#F0F0F0"/>
+      <text x="64" y="341" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="15" font-weight="600" fill="#4A90D9">今天</text>
+      <text x="193" y="341" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="15" fill="#999999">全部</text>
+      <text x="322" y="341" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="15" fill="#999999">日历</text>
+      <text x="451" y="341" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="15" fill="#999999">我的</text>
+
+      <!-- AI + plus FABs -->
+      <g transform="translate(430 228)">
+        <circle cx="22" cy="0" r="17" fill="url(#ai-fab)"/>
+        <text x="22" y="5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="12" font-weight="700" fill="#fff">AI</text>
+        <circle cx="22" cy="44" r="20" fill="#4A90D9"/>
+        <rect x="14" y="42" width="16" height="4" rx="2" fill="#fff"/>
+        <rect x="20" y="36" width="4" height="16" rx="2" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">AI 一句拆成多条任务</title>
+  <desc id="desc">把「张三 8月8日 农历生日，李四 9月10日 新历生日」交给 parseTask。张三写成农历八月初八、每年由生日引擎续期；李四写成公历 9 月 10 日。可直连 OpenAI 兼容接口，或走云函数 aiProxy 免域名白名单。</desc>
+
+  <defs>
+    <clipPath id="parse-clip">
+      <rect width="1200" height="360" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#parse-clip)">
+    <rect width="1200" height="360" fill="#F3F5F8"/>
+
+    <text x="56" y="48" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="18" font-weight="600" fill="#185FA5">AI 智能创建</text>
+    <text x="1144" y="48" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#B4B2A9">parseTask → tasks[]</text>
+
+    <!-- Utterance, matching the AI input card -->
+    <g transform="translate(56 68)">
+      <rect width="1088" height="78" rx="16" fill="#FFFFFF" stroke="#ECECEC"/>
+      <rect width="6" height="78" rx="3" fill="#6A5ACD"/>
+      <text x="28" y="34" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="20" font-weight="600" fill="#2C2C2A">张三 8月8日 农历生日，李四 9月10日 新历生日</text>
+      <text x="28" y="60" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">文字或语音 · 首页 AI 按钮 · 示例来自 pages/ai-input</text>
+    </g>
+
+    <!-- Arrow -->
+    <g transform="translate(56 160)">
+      <path d="M0 10 H1088" stroke="#E6F1FB" stroke-width="2"/>
+      <circle cx="544" cy="10" r="16" fill="#E6F1FB"/>
+      <path d="M544 2 v16 M536 12 l8 6 8-6" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Two parsed task cards in the real task-item language -->
+    <g transform="translate(56 196)">
+      <rect width="528" height="100" rx="16" fill="#FFFFFF"/>
+      <circle cx="32" cy="36" r="11" fill="none" stroke="#D0D0D0" stroke-width="2.2"/>
+      <circle cx="58" cy="36" r="4" fill="#E24B4A"/>
+      <text x="76" y="42" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="22" font-weight="600" fill="#2C2C2A">张三生日</text>
+      <rect x="184" y="24" width="44" height="22" rx="6" fill="#FFF3E0"/>
+      <text x="206" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="14" font-weight="600" fill="#E65100">生日</text>
+      <rect x="236" y="24" width="44" height="22" rx="6" fill="#E8F0FC"/>
+      <text x="258" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="14" font-weight="600" fill="#4A90D9">农历</text>
+      <text x="32" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#888888">calendarType: lunar</text>
+      <text x="32" y="94" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">八月初八 · dueDate 由 lunar.js 换成公历</text>
+    </g>
+
+    <g transform="translate(616 196)">
+      <rect width="528" height="100" rx="16" fill="#FFFFFF"/>
+      <circle cx="32" cy="36" r="11" fill="none" stroke="#D0D0D0" stroke-width="2.2"/>
+      <circle cx="58" cy="36" r="4" fill="#EF9F27"/>
+      <text x="76" y="42" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="22" font-weight="600" fill="#2C2C2A">李四生日</text>
+      <rect x="184" y="24" width="44" height="22" rx="6" fill="#FFF3E0"/>
+      <text x="206" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="14" font-weight="600" fill="#E65100">生日</text>
+      <rect x="236" y="24" width="44" height="22" rx="6" fill="#E8F0FC"/>
+      <text x="258" y="40" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="14" font-weight="600" fill="#4A90D9">公历</text>
+      <text x="32" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#888888">calendarType: solar</text>
+      <text x="32" y="94" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">dueDate 今年 09-10 · 过了则明年</text>
+    </g>
+
+    <text x="56" y="330" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif" font-size="16" fill="#888888">直连 OpenAI 兼容接口，或走云函数 aiProxy 免域名白名单 · DeepSeek / 千问 / Kimi / GLM / 豆包</text>
+  </g>
+</svg>
